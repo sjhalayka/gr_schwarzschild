@@ -32,7 +32,7 @@ void eulerStep(double dtau)
     // 1. Compute forces
     double dVeff_dr = (G * M) / (r * r)
         - (L * L) / (r * r * r)
-        + (3.0 * G * M * L * L) / (c * c * r * r * r * r);
+        - (3.0 * G * M * L * L) / (c * c * r * r * r * r);
 
     // 2. Euler update for momenta
     pr -= dtau * dVeff_dr;
