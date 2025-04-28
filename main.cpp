@@ -13,7 +13,7 @@ const double M = 1.98847e30;
 double r = 6.98169e10;        // [m]
 double pr = 0.0;             // radial velocity at apoapsis [m/s]
 double phi = 0.0;            // initial angle [rad]
-double pphi = 10860.0 / r;    // initial angular velocity [rad/s] (dφ/dτ), set manually
+double pphi = 38860.0 / r;    // initial angular velocity [rad/s] (dφ/dτ), set manually
 
 // Conserved quantities
 double E;                  // energy per unit mass (dimensionless)
@@ -32,7 +32,7 @@ void eulerStep(double dtau)
     // 1. Compute forces
     double dVeff_dr = (G * M) / (r * r)
         - (L * L) / (r * r * r)
-        - (3.0 * G * M * L * L) / (c * c * r * r * r * r);
+        + (3.0 * G * M * L * L) / (c * c * r * r * r * r);
 
     // 2. Euler update for momenta
     pr -= dtau * dVeff_dr;
@@ -49,6 +49,7 @@ void eulerStep(double dtau)
     orbitPoints.push_back(x);
     orbitPoints.push_back(y);
 }
+
 
 
 void initOrbit()
@@ -94,9 +95,7 @@ void display()
 
 void timer(int value)
 {
-    //symplecticStep(10000); // simulate proper time
-    //rk4Step(100000); // simulate proper time
-     eulerStep(1000);
+    eulerStep(10000);
 
     glutPostRedisplay();
     glutTimerFunc(16, timer, 0);
