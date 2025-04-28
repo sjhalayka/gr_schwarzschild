@@ -27,54 +27,12 @@ int windowWidth = 800, windowHeight = 800;
 // Schwarzschild radius
 const double rs = 2.0 * G * M / (c * c);
 
-// Derivatives
-void derivatives(double r, double pr, double& dr_dtau, double& dpr_dtau)
-{
-    double f = 1.0 - rs / r;
-
-    dr_dtau = pr;
-
-    double dVeff_dr = (G * M) / (r * r) - (L * L) / (r * r * r) + (3.0 * G * M * L * L) / (c * c * r * r * r * r);
-    dpr_dtau = -dVeff_dr;
-}
-
-
-void symplecticStep(double dtau)
-{
-    double f = 1.0 - rs / r;
-
-    // Half-step kick for radial momentum
-    double dVeff_dr = (G * M) / (r * r) - (L * L) / (r * r * r) + (3.0 * G * M * L * L) / (c * c * r * r * r * r);
-    pr -= 0.5 * dtau * dVeff_dr;
-
-    // Full-step drift for radius
-    r += dtau * pr;
-
-    // Update f after radius changes
-    f = 1.0 - rs / r;
-
-    // Full-step drift for angle phi (using updated radius)
-    phi += (L / (r * r)) * dtau;
-
-    // Recompute potential gradient at new position
-    dVeff_dr = (G * M) / (r * r) - (L * L) / (r * r * r) + (3.0 * G * M * L * L) / (c * c * r * r * r * r);
-
-    // Half-step kick for radial momentum
-    pr -= 0.5 * dtau * dVeff_dr;
-
-    // Save point for drawing
-    float x = static_cast<float>(r * cos(phi) * scale);
-    float y = static_cast<float>(r * sin(phi) * scale);
-    orbitPoints.push_back(x);
-    orbitPoints.push_back(y);
-}
-
 void eulerStep(double dtau)
 {
     // 1. Compute forces
-    double dVeff_dr = (G * M) / (r * r)
-        - (L * L) / (r * r * r)
-        + (3.0 * G * M * L * L) / (c * c * r * r * r * r);
+    double dVeff_dr = -(G * M) / (r * r)
+        + (L * L) / (r * r * r)
+        - (3.0 * G * M * L * L) / (c * c * r * r * r * r);
 
     // 2. Euler update for momenta
     pr -= dtau * dVeff_dr;
@@ -92,34 +50,6 @@ void eulerStep(double dtau)
     orbitPoints.push_back(y);
 }
 
-
-void rk4Step(double dtau)
-{
-    double k1_r, k1_pr;
-    double k2_r, k2_pr;
-    double k3_r, k3_pr;
-    double k4_r, k4_pr;
-
-    derivatives(r, pr, k1_r, k1_pr);
-
-    derivatives(r + 0.5 * dtau * k1_r, pr + 0.5 * dtau * k1_pr, k2_r, k2_pr);
-
-    derivatives(r + 0.5 * dtau * k2_r, pr + 0.5 * dtau * k2_pr, k3_r, k3_pr);
-
-    derivatives(r + dtau * k3_r, pr + dtau * k3_pr, k4_r, k4_pr);
-
-    r += (dtau / 6.0) * (k1_r + 2 * k2_r + 2 * k3_r + k4_r);
-    pr += (dtau / 6.0) * (k1_pr + 2 * k2_pr + 2 * k3_pr + k4_pr);
-
-    // Update phi using conserved angular momentum
-    phi += (L / (r * r)) * dtau;
-
-    // Store point
-    float x = static_cast<float>(r * cos(phi) * scale);
-    float y = static_cast<float>(r * sin(phi) * scale);
-    orbitPoints.push_back(x);
-    orbitPoints.push_back(y);
-}
 
 void initOrbit()
 {
@@ -165,8 +95,8 @@ void display()
 void timer(int value)
 {
     //symplecticStep(10000); // simulate proper time
-    rk4Step(10000); // simulate proper time
-    //eulerStep(10000);
+    //rk4Step(100000); // simulate proper time
+     eulerStep(10000);
 
     glutPostRedisplay();
     glutTimerFunc(16, timer, 0);
