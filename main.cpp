@@ -1,9 +1,5 @@
-﻿
-#pragma comment(lib, "freeglut")
-#pragma comment(lib, "glew32")
+﻿#pragma comment(lib, "freeglut")
 
-
-// SchwarzschildGeodesicExact.cpp
 #include <GL/glut.h>
 #include <cmath>
 #include <vector>
@@ -75,21 +71,18 @@ void symplecticStep(double dtau)
 
 void eulerStep(double dtau)
 {
-    // 1. Compute useful quantity
-    double f = 1.0 - rs / r;
-
-    // 2. Compute forces
+    // 1. Compute forces
     double dVeff_dr = (G * M) / (r * r)
         - (L * L) / (r * r * r)
         + (3.0 * G * M * L * L) / (c * c * r * r * r * r);
 
-    // 3. Euler update for momenta
+    // 2. Euler update for momenta
     pr -= dtau * dVeff_dr;
 
-    // 4. Euler update for position
+    // 3. Euler update for position
     r += dtau * pr;
 
-    // 5. Euler update for phi (angular motion)
+    // 4. Euler update for phi (angular motion)
     phi += (L / (r * r)) * dtau;
 
     // 6. Save point for drawing
@@ -172,8 +165,8 @@ void display()
 void timer(int value)
 {
     //symplecticStep(10000); // simulate proper time
-    //rk4Step(10000); // simulate proper time
-    eulerStep(10000);
+    rk4Step(10000); // simulate proper time
+    //eulerStep(10000);
 
     glutPostRedisplay();
     glutTimerFunc(16, timer, 0);
