@@ -28,22 +28,24 @@ int windowWidth = 800, windowHeight = 800;
 // Schwarzschild radius
 const double rs = 2.0 * G * M / (c * c);
 
+const double m = 3.285e23;
+
+
 void eulerStep(double dtau)
 {
     double Veff = sqrt((1 - rs / r) * ((L * L) / (r * r)));
     
     // 1. Compute forces
-	//double dVeff_dr = (G * M) / (r * r)
-	//	- (L * L) / (r * r * r)
-	//	- (3.0 * G * M * L * L) / (c * c * r * r * r * r);
+	double dVeff_dr = (G * M) / (r * r)
+		- (L * L) / (r * r * r)
+		- (3.0 * G * M * L * L) / (c * c * r * r * r * r);
 
-    double dVeff_dr = (c * c * r * r * rs + L * L * (3 * rs - 2 * r)) / (2 * r * r * r * r);
+   // double dVeff_dr = (c * c * r * r * rs + L * L * (3 * rs - 2 * r)) / (2 * r * r * r * r);
 
-   // double epsilon = 0; // photon
-    double speed = L / r; // photon
+    double speed = L / r; // massive particle
 
     cout << speed << endl;
-    
+
     // 2. Euler update for momenta
     pr -= dtau * dVeff_dr;
 
